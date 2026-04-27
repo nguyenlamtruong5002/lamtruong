@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CHTT THẠNH HƯNG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --p-blue: #1e3799; --ca1: #007bff; --ca2: #fd7e14; --danger: #d63031; --success: #27ae60; --apple-bg: #f2f2f7; }
+        body { background-color: var(--apple-bg); font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding-bottom: 50px; }
+        .header-title { background: var(--p-blue); color: white; padding: calc(15px + env(safe-area-inset-top)) 15px 15px; text-align: center; border-radius: 0 0 25px 25px; }
+        
+        .nav-tabs-ios { display: flex; background: #e3e3e8; border-radius: 12px; padding: 2px; margin: 15px; border: none; }
+        .nav-tabs-ios .nav-link { flex: 1; border: none; border-radius: 10px; color: #3a3a3c; font-weight: 600; padding: 10px; transition: 0.2s; }
+        .nav-tabs-ios .nav-link.active { background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: var(--p-blue); }
+
+        .card-custom { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .input-group-custom { display: flex; align-items: center; background: #f9f9fb; padding: 10px 15px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #eee; }
+        .label-v { width: 95px; font-weight: 700; color: #666; font-size: 0.8rem; }
+        .form-control-v { border: none; font-weight: 800; font-size: 1.25rem; text-align: right; width: 100%; background: transparent; outline: none; }
+        
+        .total-revenue-box { background: #fff5f5; border: 1px dashed var(--danger); color: var(--danger); }
+        .readonly-sync { color: var(--success) !important; background: #f0fff4 !important; border: 1px solid #c6f6d5 !important; }
+
+        .ca-badge { font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 8px; color: white; display: inline-block; margin-bottom: 8px; }
+        .btn-ios { border-radius: 15px; font-weight: 700; padding: 16px; transition: 0.1s; border: none; }
+        .btn-ios:active { transform: scale(0.96); opacity: 0.8; }
+
+        .ck-item { background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 5px solid var(--success); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .history-item { background: white; padding: 15px; border-radius: 18px; margin-bottom: 12px; border-left: 6px solid var(--p-blue); }
+        .detail-group-title { background: #f0f2f5; color: var(--p-blue); padding: 8px 12px; font-size: 0.8rem; font-weight: 800; border-radius: 10px; margin-top: 15px; }
+        
+        /* Style cho phần rút gọn CK */
+        .ck-toggle-btn { background: #f8f9fa; border: 1px solid #e9ecef; color: var(--p-blue); font-size: 0.75rem; font-weight: 700; border-radius: 8px; padding: 8px; width: 100%; text-align: left; margin-top: 5px; cursor: pointer; }
+        .ck-details-list { display: none; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="header-title">
+    <h5 class="mb-0 fw-bold">CHTT THẠNH HƯNG</h5>
+    <small class="opacity-75">Quản lý doanh thu & Chuyển khoản</small>
+</div>
+
+<ul class="nav nav-tabs nav-tabs-ios" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabChuyenKhoan" type="button">💸 Chuyển Khoản</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabDoanhThu" type="button">📊 Doanh Thu</button>
+    </li>
+</ul>
+
+<div class="tab-content container">
+    <div class="tab-pane fade show active" id="tabChuyenKhoan">
+        <div class="card-custom">
+            <div class="ca-badge bg-success">Thêm khách CK</div>
+            <div class="input-group-custom"><span class="label-v">SỐ TIỀN</span><input type="text" inputmode="numeric" class="form-control-v input-money text-success" id="ck_val" placeholder="0"></div>
+            <div class="input-group-custom"><span class="label-v">NGÂN HÀNG</span><input type="text" class="form-control-v" id="ck_bank" style="font-size: 1rem;" placeholder="Vietcombank, MB..."></div>
+            <div class="input-group-custom"><span class="label-v">MÃ GD</span><input type="text" class="form-control-v" id="ck_code" style="font-size: 1rem;" placeholder="Mã xác nhận..."></div>
+            <textarea id="ck_note" class="form-control border-0 bg-light rounded-3 mt-2" rows="2" placeholder="Ghi chú..."></textarea>
+            <button class="btn btn-success btn-ios w-100 mt-3 shadow" onclick="themChuyenKhoan()">➕ THÊM VÀO DANH SÁCH</button>
+        </div>
+        <h6 class="fw-bold mt-4 mb-2 d-flex justify-content-between">
+            <span>DS CHI TIẾT CK</span>
+            <span class="text-success" id="badgeTotalCK">0đ</span>
+        </h6>
+        <div id="currentCKList"></div>
+    </div>
+
+    <div class="tab-pane fade" id="tabDoanhThu">
+        <div id="alertPending" class="alert alert-warning fw-bold d-none rounded-4 shadow-sm mb-3"></div>
+        <div class="card-custom">
+            <div class="ca-badge" style="background: var(--ca1);">Ca 1</div>
+            <div class="input-group-custom"><span class="label-v">XĂNG 01</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c1_t1" placeholder="0"></div>
+            <div class="input-group-custom"><span class="label-v">XĂNG 02</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c1_t2" placeholder="0"></div>
+            <div class="input-group-custom"><span class="label-v">DẦU 0.001</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c1_t3" placeholder="0"></div>
+            <div class="input-group-custom"><span class="label-v">DẦU 0.05</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c1_t4" placeholder="0"></div>
+
+            <div class="ca-badge mt-2" style="background: var(--ca2);">Ca 2</div>
+            <div class="input-group-custom"><span class="label-v">XĂNG 01</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c2_t1" placeholder="0"></div>
+            <div class="input-group-custom"><span class="label-v">XĂNG 02</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c2_t2" placeholder="0"></div>
+            <div class="input-group-custom"><span class="label-v">DẦU 0.001</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c2_t3" placeholder="0"></div>
+            <div class="input-group-custom"><span class="label-v">DẦU 0.05</span><input type="text" inputmode="numeric" class="form-control-v input-money pillar-input" id="c2_t4" placeholder="0"></div>
+
+            <div class="input-group-custom total-revenue-box mt-3">
+                <span class="label-v text-danger">TỔNG DOANH THU</span>
+                <input type="text" class="form-control-v text-danger" id="total_revenue_display" value="0" readonly>
+            </div>
+
+            <div class="ca-badge mt-2 bg-secondary">Khấu trừ</div>
+            <div class="input-group-custom"><span class="label-v text-muted">CÔNG NỢ/ MÃ TEST</span><input type="text" inputmode="numeric" class="form-control-v input-money" id="cn" placeholder="0"></div>
+            <div class="input-group-custom readonly-sync">
+                <span class="label-v text-success">TỔNG CK </span>
+                <input type="text" class="form-control-v text-success" id="ck_sync_display" value="0" readonly>
+            </div>
+
+            <div class="row g-2 mt-3">
+                <div class="col-6"><button id="btnLuuNgay1" class="btn btn-outline-primary btn-ios w-100" onclick="confirmLuu()">💾 LƯU NGÀY 1</button></div>
+                <div class="col-6"><button class="btn btn-primary btn-ios w-100 shadow" onclick="tinhToanTong()">🚀 TỔNG & QR</button></div>
+            </div>
+        </div>
+
+        <div id="sectionKetQua" class="mt-3" style="display:none;">
+            <div class="card-custom text-center shadow-lg border border-primary">
+                <div id="chiTietGom" class="small mb-1 fw-bold text-primary"></div>
+                <h1 id="hienThiPhaiNop" class="text-danger fw-bold mb-3" style="font-size: 2.2rem;">0</h1>
+                <div id="qrCode" class="d-flex justify-content-center"></div>
+                <div id="noiDungQR" class="mt-2 p-2 bg-light rounded-3 fw-bold small border text-break"></div>
+                <button class="btn btn-success btn-ios w-100 mt-3 shadow" onclick="xacNhanDaNop()">✅ XÁC NHẬN ĐÃ NỘP</button>
+            </div>
+        </div>
+        <h6 class="fw-bold mt-4 mb-3">LỊCH SỬ GẦN ĐÂY</h6>
+        <div id="lichSuList"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content" style="border-radius: 25px 25px 0 0; position: absolute; bottom: 0; border: none;">
+            <div class="modal-header border-0"><h5 class="modal-title fw-bold text-center w-100">Chi Tiết Gộp</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" id="detailBody" style="max-height: 85vh; overflow-y: auto; padding-bottom: 60px; background: #fff;"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // --- TIỆN ÍCH ---
+    document.querySelectorAll('.input-money').forEach(i => {
+        i.addEventListener('input', function() {
+            let v = this.value.replace(/[^0-9]/g, '');
+            this.value = v ? Number(v).toLocaleString('en-US') : "";
+            if(this.classList.contains('pillar-input')) calculateLiveTotal();
+        });
+    });
+
+    function getNum(id) { 
+        let val = Number(document.getElementById(id).value.replace(/,/g, '')) || 0; 
+        return val < 0 ? 0 : val;
+    }
+    function fmt(n) { return n.toLocaleString('en-US'); }
+
+    function calculateLiveTotal() {
+        const total = Array.from(document.querySelectorAll('.pillar-input')).reduce((sum, input) => sum + getNum(input.id), 0);
+        document.getElementById('total_revenue_display').value = fmt(total);
+    }
+
+    // --- CHUYỂN KHOẢN ---
+    let currentCKs = JSON.parse(localStorage.getItem('TH_TEMP_CK_V6') || '[]');
+
+    function themChuyenKhoan() {
+        const val = getNum('ck_val');
+        const bank = document.getElementById('ck_bank').value;
+        if(!val || !bank) return alert("Nhập số tiền và ngân hàng!");
+
+        const now = new Date();
+        const fullTime = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+        currentCKs.push({ val, bank, code: document.getElementById('ck_code').value, note: document.getElementById('ck_note').value, time: fullTime });
+        localStorage.setItem('TH_TEMP_CK_V6', JSON.stringify(currentCKs));
+        
+        ['ck_val', 'ck_bank', 'ck_code', 'ck_note'].forEach(id => document.getElementById(id).value = '');
+        updateSyncDisplay(); renderCurrentCK();
+    }
+
+    function updateSyncDisplay() {
+        const total = currentCKs.reduce((a, b) => a + b.val, 0);
+        document.getElementById('ck_sync_display').value = fmt(total);
+        document.getElementById('badgeTotalCK').innerText = fmt(total) + 'đ';
+    }
+
+    function renderCurrentCK() {
+        let html = '';
+        currentCKs.forEach(item => {
+            html += `<div class="ck-item d-flex justify-content-between align-items-center">
+                <div><b>${item.bank.toUpperCase()}</b> <br><small class="text-primary fw-bold">${item.time}</small></div>
+                <div class="text-success fw-bold">${fmt(item.val)}đ</div>
+            </div>`;
+        });
+        document.getElementById('currentCKList').innerHTML = html || '<p class="text-center small text-muted">Trống</p>';
+    }
+
+    // --- LOGIC LƯU & QR ---
+    function isPillarDataValid() {
+        const inputs = document.querySelectorAll('.pillar-input');
+        let hasValue = false;
+        inputs.forEach(input => { if(getNum(input.id) > 0) hasValue = true; });
+        return hasValue;
+    }
+
+    function confirmLuu() {
+        if(!isPillarDataValid()) return alert("LỖI: Bạn phải nhập ít nhất 1 giá trị vào các ô Trụ bơm!");
+        if(confirm("LƯU NGÀY 1?")) {
+            const data = {
+                c1: [getNum('c1_t1'), getNum('c1_t2'), getNum('c1_t3'), getNum('c1_t4')],
+                c2: [getNum('c2_t1'), getNum('c2_t2'), getNum('c2_t3'), getNum('c2_t4')],
+                dt: Array.from(document.querySelectorAll('.pillar-input')).reduce((sum, input) => sum + getNum(input.id), 0),
+                cn: getNum('cn'), ckList: [...currentCKs], ckTotal: currentCKs.reduce((a,b)=>a+b.val, 0),
+                date: new Date().toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})
+            };
+            localStorage.setItem('TH_DATA_N1_V6', JSON.stringify(data));
+            localStorage.removeItem('TH_TEMP_CK_V6'); location.reload();
+        }
+    }
+
+    function tinhToanTong() {
+        if(!localStorage.getItem('TH_DATA_N1_V6')) return alert("Hãy lưu NGÀY 1 trước!");
+        if(!isPillarDataValid()) return alert("LỖI: Bạn phải nhập ít nhất 1 giá trị vào các ô Trụ bơm của NGÀY 2!");
+
+        const n1 = JSON.parse(localStorage.getItem('TH_DATA_N1_V6'));
+        const n2 = {
+            c1: [getNum('c1_t1'), getNum('c1_t2'), getNum('c1_t3'), getNum('c1_t4')],
+            c2: [getNum('c2_t1'), getNum('c2_t2'), getNum('c2_t3'), getNum('c2_t4')],
+            dt: Array.from(document.querySelectorAll('.pillar-input')).reduce((sum, input) => sum + getNum(input.id), 0),
+            cn: getNum('cn'), ckList: [...currentCKs], ckTotal: currentCKs.reduce((a,b)=>a+b.val, 0),
+            date: new Date().toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})
+        };
+
+        const nopGoc = (n1.dt + n2.dt) - (n1.cn + n2.cn) - (n1.ckTotal + n2.ckTotal);
+        const phi = Math.ceil((nopGoc * 0.0049) / 1000) * 1000;
+        const phaiNop = nopGoc - phi < 0 ? 0 : nopGoc - phi;
+        const nd = `CHTT TH THANH HUNG NOP TIEN CUA NGAY ${n1.date} VA NGAY ${n2.date} PHI ${fmt(phi)}`;
+
+        document.getElementById('chiTietGom').innerText = `Gộp: ${n1.date} & ${n2.date}`;
+        document.getElementById('hienThiPhaiNop').innerText = fmt(phaiNop);
+        document.getElementById('sectionKetQua').style.display = 'block';
+        
+        const qrContainer = document.getElementById('qrCode');
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, { text: generateVietQR("970415", "114000123687", phaiNop, nd), width: 220, height: 220 });
+        document.getElementById('noiDungQR').innerText = nd;
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        window.tempResult = { n1, n2, phaiNop, phi, nd };
+    }
+
+    function xacNhanDaNop() {
+        const h = JSON.parse(localStorage.getItem('TH_HIST_V6') || '[]');
+        h.unshift(window.tempResult);
+        localStorage.setItem('TH_HIST_V6', JSON.stringify(h.slice(0, 15)));
+        localStorage.removeItem('TH_DATA_N1_V6'); localStorage.removeItem('TH_TEMP_CK_V6');
+        location.reload();
+    }
+
+    // --- VIETQR ---
+    function generateVietQR(bankBin, accountNo, amount, description) {
+        const f = (id, val) => id + val.length.toString().padStart(2, '0') + val;
+        const guid = f("00", "A000000727");
+        const bankData = f("00", bankBin) + f("01", accountNo);
+        const merchant = f("38", guid + f("01", bankData));
+        let payload = "000201010212" + merchant + "520459115303704" + f("54", amount.toString()) + "5802VN" + f("62", f("08", description)) + "6304";
+        function crc16(str) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < str.length; i++) {
+                let x = ((crc >> 8) ^ str.charCodeAt(i)) & 0xFF; x ^= x >> 4;
+                crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
+            }
+            return crc.toString(16).toUpperCase().padStart(4, '0');
+        }
+        return payload + crc16(payload);
+    }
+
+    // --- LỊCH SỬ RÚT GỌN ---
+    function toggleCK(id) {
+        const el = document.getElementById(id);
+        const btn = el.previousElementSibling;
+        if (el.style.display === "block") {
+            el.style.display = "none";
+            btn.innerText = btn.getAttribute('data-closed-text');
+        } else {
+            el.style.display = "block";
+            btn.innerText = "🔼 Thu gọn chi tiết";
+        }
+    }
+
+    function xemChiTiet(idx) {
+        const h = JSON.parse(localStorage.getItem('TH_HIST_V6'))[idx];
+        const lbl = ["Xăng 01", "Xăng 02", "Dầu 001", "Dầu 05"];
+        
+        const renderDay = (d, title, dayKey) => {
+            const ckCount = d.ckList.length;
+            const closedText = `➕ Xem chi tiết ${ckCount} món CK`;
+            return `
+                <div class="detail-group-title">${title} (${d.date})</div>
+                <div class="p-2 border rounded-3 mt-2 small">
+                    <div class="d-flex justify-content-between fw-bold text-danger mb-2"><span>DOANH THU:</span><span>${fmt(d.dt)}đ</span></div>
+                    <div class="row g-0">
+                        <div class="col-6 border-end pe-2"><b>Ca 1:</b> ${d.c1.map((v,i)=>`<div>${lbl[i]}: ${fmt(v)}</div>`).join('')}</div>
+                        <div class="col-6 ps-2"><b>Ca 2:</b> ${d.c2.map((v,i)=>`<div>${lbl[i]}: ${fmt(v)}</div>`).join('')}</div>
+                    </div>
+                    <div class="mt-2 pt-1 border-top text-success fw-bold d-flex justify-content-between"><span>TỔNG CK:</span><span>-${fmt(d.ckTotal)}</span></div>
+                    
+                    <button class="ck-toggle-btn" data-closed-text="${closedText}" onclick="toggleCK('ckList_${dayKey}_${idx}')">
+                        ${closedText}
+                    </button>
+                    <div class="ck-details-list" id="ckList_${dayKey}_${idx}">
+                        ${d.ckList.map(ck => `<div class="d-flex justify-content-between border-bottom py-1"><div><span class="fw-bold">${ck.bank}</span><br><small class="text-primary">${ck.time}</small></div><span class="fw-bold">${fmt(ck.val)}</span></div>`).join('') || '<small>Trống</small>'}
+                    </div>
+                </div>
+            `;
+        };
+
+        document.getElementById('detailBody').innerHTML = `
+            <div class="text-center mb-3">
+                <div class="h2 fw-bold text-danger">${fmt(h.phaiNop)} đ</div>
+                <small>Phí: ${fmt(h.phi)}đ</small>
+            </div>
+            ${renderDay(h.n1, "NGÀY 1", "n1")}
+            ${renderDay(h.n2, "NGÀY 2", "n2")}
+        `;
+        new bootstrap.Modal(document.getElementById('modalDetail')).show();
+    }
+
+    function renderLichSu() {
+        const h = JSON.parse(localStorage.getItem('TH_HIST_V6') || '[]');
+        let html = '';
+        h.forEach((s, i) => {
+            html += `<div class="history-item d-flex justify-content-between align-items-center" onclick="xemChiTiet(${i})">
+                <div><div class="fw-bold text-primary">📅 ${s.n1.date} - ${s.n2.date}</div><div class="small text-muted">Bấm xem 16 trụ & CK</div></div>
+                <div class="text-end"><div class="fw-bold text-danger">${fmt(s.phaiNop)}đ</div><small class="text-muted">Gộp ${s.n1.ckList.length + s.n2.ckList.length} CK</small></div>
+            </div>`;
+        });
+        document.getElementById('lichSuList').innerHTML = html || '<p class="text-center text-muted small">Trống</p>';
+    }
+
+    if(localStorage.getItem('TH_DATA_N1_V6')) {
+        document.getElementById('alertPending').classList.remove('d-none');
+        document.getElementById('alertPending').innerText = `📍 ĐÃ LƯU DỮ LIỆU NGÀY 1`;
+        document.getElementById('btnLuuNgay1').disabled = true;
+        document.getElementById('btnLuuNgay1').className = "btn btn-light btn-ios w-100";
+    }
+    updateSyncDisplay(); renderCurrentCK(); renderLichSu();
+</script>
+</body>
+</html>
